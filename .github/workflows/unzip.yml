@@ -1,0 +1,32 @@
+name: Unzip
+
+on:
+  workflow_dispatch:
+    inputs:
+      zip_file:
+        description: "Zip ফাইলের নাম"
+        default: "Azimr-website.zip"
+
+permissions:
+  contents: write
+
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Unzip
+        env:
+          ZIP: ${{ inputs.zip_file }}
+        run: |
+          unzip -o "$ZIP" -x ".github/*" "__MACOSX/*"
+          rm "$ZIP"
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Unzip project files" || echo "No changes"
+          git push
